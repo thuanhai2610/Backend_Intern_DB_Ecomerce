@@ -28,7 +28,14 @@ import StaticS3Module from './common/c5-static-s3/static-s3.module';
 import ProvinceModule from './common/c6-province/province.module';
 import DistrictModule from './common/c7-district/district.module';
 import VillageModule from './common/c8-village/village.module';
-
+import ShopModule from './features/f2-shop/shop.module';
+import ProductModule from './features/f3-products/product.module';
+import CategoryModule from './features/f4-categories/category.module';
+import DiscountModule from './features/f5-discounts/discount.module';
+import ShippingMethodModule from './features/f6-shipping-method/shipping-method.module';
+import SkuModule from './features/f7-skus/sku.module';
+import CartModule from './features/f8-cart/cart.module';
+import SearchItemModule from './features/f12-searchItem/searchItem.module';
 const routes: Routes = [
   {
     path: '/v1',
@@ -65,6 +72,15 @@ const routes: Routes = [
       { path: '/cron-settings', module: CronSettingModule },
 
       { path: '/tests', module: TestModule },
+     
+      { path: '/shops', module: ShopModule },
+      { path: '/products', module: ProductModule },
+      { path: '/categories', module: CategoryModule },
+      { path: '/discounts', module: DiscountModule },
+      { path: '/shipping-method', module: ShippingMethodModule },
+      { path: '/skus', module: SkuModule },
+      { path: '/carts', module: CartModule },
+      { path: '/searchitems', module: SearchItemModule },
       { path: '/app-subscriptions', module: AppSubscriptionModule },
     ],
   },
@@ -110,6 +126,15 @@ const imports = [
   // features
   TestModule,
   AppSubscriptionModule,
+ShopModule,
+ProductModule,
+CartModule,
+CategoryModule,
+DiscountModule,
+ShippingMethodModule,
+SkuModule,
+SearchItemModule,
+
 ];
 
 if (ShareFunction.checkIsConfigS3Storage()) {

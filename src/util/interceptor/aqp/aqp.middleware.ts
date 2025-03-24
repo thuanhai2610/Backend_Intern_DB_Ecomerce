@@ -18,7 +18,7 @@ export default class AQPMiddleware implements NestMiddleware {
     }
 
     // Convert req.query to api-query-params
-    const query: any = aqp(req.query, { skipKey: 'page' });
+    const query: any = aqp(req.query as any, { skipKey: 'page' });
 
     // Validate params
     try {

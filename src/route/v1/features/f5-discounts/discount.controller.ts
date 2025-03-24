@@ -17,15 +17,15 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import ParseObjectIdPipe from '@pipe/parse-object-id.pipe';
 import { Types } from 'mongoose';
-import CreateTestDto from './dto/create-test.dto';
-import UpdateTestDto from './dto/update-test.dto';
-import TestService from './test.service';
+import CreateDiscountDto from './dto/create-discount.dto';
+import UpdateDiscountDto from './dto/update-discount.dto';
+import DiscountService from './discount.service';
 
-@ApiTags('Tests')
+@ApiTags('Discounts')
 @UseInterceptors(WrapResponseInterceptor)
 @Controller()
-export default class TestController {
-  constructor(private readonly testService: TestService) {}
+export default class DiscountController {
+  constructor(private readonly discountService: DiscountService) {}
 
   /**
    * Find all
@@ -36,7 +36,7 @@ export default class TestController {
   @Get('')
   @HttpCode(200)
   async findAll(@Query() query: any): Promise<any> {
-    const result = await this.testService.findManyBy(query);
+    const result = await this.discountService.findManyBy(query);
     return result;
   }
 
@@ -48,8 +48,8 @@ export default class TestController {
    */
   @Post('')
   @HttpCode(201)
-  async create(@Body() body: CreateTestDto): Promise<any> {
-    const result = await this.testService.create(body);
+  async create(@Body() body: CreateDiscountDto): Promise<any> {
+    const result = await this.discountService.create(body);
 
     return result;
   }
@@ -65,9 +65,9 @@ export default class TestController {
   @HttpCode(200)
   async update(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body() body: UpdateTestDto,
+    @Body() body: UpdateDiscountDto,
   ): Promise<any> {
-    const result = await this.testService.updateOneById(id, body);
+    const result = await this.discountService.updateOneById(id, body);
 
     return result;
   }
@@ -81,7 +81,7 @@ export default class TestController {
   @Delete(':ids/ids')
   // @HttpCode(204)
   async deleteManyByIds(@Param('ids') ids: string): Promise<any> {
-    const result = await this.testService.deleteManyHardByIds(
+    const result = await this.discountService.deleteManyHardByIds(
       ids.split(',').map((item: any) => new Types.ObjectId(item)),
     );
     return result;
@@ -98,7 +98,7 @@ export default class TestController {
   async delete(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
   ): Promise<any> {
-    const result = await this.testService.deleteOneHardById(id);
+    const result = await this.discountService.deleteOneHardById(id);
 
     return result;
   }
@@ -112,7 +112,7 @@ export default class TestController {
   @Get('paginate')
   @HttpCode(200)
   async paginate(@ApiQueryParams() query: AqpDto): Promise<any> {
-    return this.testService.paginate(query);
+    return this.discountService.paginate(query);
   }
 
   /**
@@ -126,7 +126,7 @@ export default class TestController {
   async findOneBy(
     @ApiQueryParams() { filter, projection }: AqpDto,
   ): Promise<any> {
-    return this.testService.findOneBy(filter, {
+    return this.discountService.findOneBy(filter, {
       filter,
       projection,
     });
@@ -144,14 +144,10 @@ export default class TestController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @ApiQueryParams('population') populate: AqpDto,
   ): Promise<any> {
-    const result = await this.testService.findOneById(id, { populate });
+    const result = await this.discountService.findOneById(id, { populate });
 
     if (!result) throw new NotFoundException('The item does not exist');
 
     return result;
   }
-   
-
-
-
 }
