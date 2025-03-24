@@ -1,31 +1,30 @@
-import { IsMongoId, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 
 export default class CreateOrderDto {
   @IsNotEmpty()
   @IsMongoId()
-  orderId: string;
+  userId: string;
 
   @IsNotEmpty()
   @IsMongoId()
-  productId: string;
+  shopId: string;
+
+  @IsOptional()
+  @IsMongoId()
+  discountId?: string;
 
   @IsNotEmpty()
   @IsMongoId()
-  skuId: string;
+  shippingMethodId: string;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  price: number;
+  totalAmount: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(1)
-  quantity: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(0)
-  total: number;
+  @IsString()
+  @IsEnum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
+  status: string;
 }
