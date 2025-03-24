@@ -75,8 +75,8 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
 
-  const rolesGuard = app.get<RolesGuard>(RolesGuard);
-  app.useGlobalGuards(rolesGuard);
+  // const rolesGuard = app.get<RolesGuard>(RolesGuard);
+  // app.useGlobalGuards(rolesGuard);
 
   // run app
   await app.listen(port, async () => {

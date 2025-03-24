@@ -3,14 +3,14 @@ import { ObjectId } from 'mongodb';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'order-items' })
 export class OrderItem {
-  @Prop({ type: ObjectId, ref: 'Order', required: true })
-  orderId:ObjectId;
+  @Prop({ type: String, ref: 'Order', required: true })
+  orderId: string;
 
-  @Prop({ type: ObjectId, ref: 'Product', required: true })
-  productId: ObjectId;
+  @Prop({ type: String, ref: 'Product', required: true })
+  productId: string;
 
-  @Prop({ type: ObjectId, ref: 'Sku', required: true })
-  skuId: ObjectId;
+  @Prop({ type: String, ref: 'Sku', required: true })
+  skuId: string;
 
   @Prop({ type: Number, default: 0 })
   quantity: number;

@@ -1,12 +1,15 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import mongoose from 'mongoose';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export default class CreateProductDto {
   @IsNotEmpty()
-  shopId: mongoose.Schema.Types.ObjectId;
+  @Type(() => Number)
+  shopId: number;
 
   @IsNotEmpty()
-  categoryId: mongoose.Schema.Types.ObjectId;
+  @Type(() => Number)
+  categoryId: number;
 
   @IsNotEmpty()
   @IsString()
@@ -18,6 +21,7 @@ export default class CreateProductDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Type(() => Number)
   price: number;
 
   @IsOptional()
@@ -27,4 +31,15 @@ export default class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isActive: boolean
+
+
+  @ApiProperty({ description: 'Trạng thái tồn kho'})
+  @IsBoolean()
+  @IsOptional()
+  inStock?: boolean;
+   @ApiProperty({ description: 'Số lượng tồn kho'})
+    @IsNumber()
+    @Min(0)
+    @IsOptional()
+    stockQuantity?: number;
 }

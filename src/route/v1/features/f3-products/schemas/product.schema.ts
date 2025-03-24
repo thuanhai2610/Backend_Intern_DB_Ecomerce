@@ -3,11 +3,11 @@ import mongoose, { Document } from 'mongoose';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'products' })
 export class Product {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
-  shopId: mongoose.Schema.Types.ObjectId;
+  @Prop({  ref: 'Shop', required: true })
+  shopId: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true })
-  categoryId: mongoose.Schema.Types.ObjectId;
+  @Prop({ ref: 'Category', required: true })
+  categoryId: number;
 
   @Prop({ type: String, required: true })
   name: string;
@@ -23,6 +23,11 @@ export class Product {
 
   @Prop({default : true})
   isActive: boolean;
+  @Prop({ default: true })
+  inStock: boolean;
+
+  @Prop({ default: 0, min: 0 })
+  stockQuantity: number;
 }
 
 export type ProductDocument = Product & Document;

@@ -3,8 +3,8 @@ import mongoose, { Document } from 'mongoose';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'discounts' })
 export class Discount {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
-  shopId: mongoose.Schema.Types.ObjectId;
+  @Prop({type: String, ref: 'shops', required: true })
+  shopId: string;
 
   @Prop({ type: String, enum: ['percentage', 'fixed'], required: true })
   discountType: string;

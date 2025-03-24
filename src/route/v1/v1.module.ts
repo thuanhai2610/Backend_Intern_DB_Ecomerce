@@ -35,7 +35,11 @@ import DiscountModule from './features/f5-discounts/discount.module';
 import ShippingMethodModule from './features/f6-shipping-method/shipping-method.module';
 import SkuModule from './features/f7-skus/sku.module';
 import CartModule from './features/f8-cart/cart.module';
-import SearchItemModule from './features/f12-searchItem/searchItem.module';
+
+import OrderModule from './features/f9-orders/order.module';
+import OrderItemModule from './features/f10-orderitems/orderitem.module';
+import NotifycationModule from './features/f11-notifycations/notifycation.module';
+import SearchItemModule from './features/f12-searchItem/search-item.module';
 const routes: Routes = [
   {
     path: '/v1',
@@ -80,6 +84,9 @@ const routes: Routes = [
       { path: '/shipping-method', module: ShippingMethodModule },
       { path: '/skus', module: SkuModule },
       { path: '/carts', module: CartModule },
+      { path: '/orders', module: OrderModule },
+      { path: '/orderitems', module: OrderItemModule},
+      { path: '/notifycations', module: NotifycationModule },
       { path: '/searchitems', module: SearchItemModule },
       { path: '/app-subscriptions', module: AppSubscriptionModule },
     ],
@@ -133,6 +140,9 @@ CategoryModule,
 DiscountModule,
 ShippingMethodModule,
 SkuModule,
+OrderModule,
+OrderItemModule,
+NotifycationModule,
 SearchItemModule,
 
 ];

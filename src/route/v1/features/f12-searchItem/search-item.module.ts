@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SearchItem, SearchItemSchema } from './schemas/searchItem.schema';
-import SearchItemController from './searchItem.controller';
+import { SearchItem, SearchItemSchema } from './schemas/search-item.schema';
+import SearchItemController from './search-item.controller';
 
-import { SearchItemRepository } from './searchItem.repository';
-import { SearchItemService } from './searchItem.service';
+import { SearchItemRepository } from './search-item.repository';
+import { SearchItemService } from './search-item.service';
 
 @Module({
   imports: [

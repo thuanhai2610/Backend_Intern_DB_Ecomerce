@@ -1,11 +1,12 @@
 
 import { Injectable } from '@nestjs/common';
-import { SearchItem } from './schemas/searchItem.schema';
-import { SearchItemRepository } from './searchItem.repository';
+
 import { InjectModel } from '@nestjs/mongoose';
-import { search } from 'superagent';
+
 import { Model } from 'mongoose';
 import { SearchItemDto } from './dto/search-item.dto';
+import { SearchItem } from './schemas/search-item.schema';
+import { SaveItemDto } from './dto/save-item.dto';
 
 
 
@@ -35,5 +36,18 @@ export  class SearchItemService  {
       }
 
       return this.searchmodel.find(query).exec();
+  }
+  async saveItem(saveItemDto: SaveItemDto): Promise<SearchItem> {
+    const newItem = new this.searchmodel({
+      name: saveItemDto.name,
+      description: saveItemDto.description,
+      category: saveItemDto.category,
+      price: saveItemDto.price,
+      inStock: saveItemDto.inStock !== undefined ? saveItemDto.inStock : true, // Mặc định từ schema
+      stockQuantity: saveItemDto.stockQuantity !== undefined ? saveItemDto.stockQuantity : 0, // Mặc định từ schema
+    });
+
+    // Lưu vào database
+    return newItem.save();
   }
 }

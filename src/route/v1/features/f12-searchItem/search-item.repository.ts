@@ -1,8 +1,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { SearchItem } from './schemas/searchItem.schema';
+
 import { Model } from 'mongoose';
+import { SearchItem } from './schemas/search-item.schema';
 
 @Injectable()
 export class SearchItemRepository  {

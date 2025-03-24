@@ -4,8 +4,8 @@ import mongoose, { Document } from 'mongoose';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'skus' })
 export class Sku {
-  @Prop({ type: ObjectId, ref: 'Product', required: true })
-  productId: ObjectId;
+  @Prop({ type: String, ref: 'Product', required: true })
+  productId: string;
 
   @Prop({ type: String, required: true })
   name: string;
@@ -13,7 +13,7 @@ export class Sku {
   @Prop({ type: Number, default: 0})
   price: number;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   stock: number;
 
   @Prop({

@@ -1,9 +1,9 @@
 import { IsString, IsOptional, IsNumber, IsBoolean } from "class-validator";
-
+import { Type } from 'class-transformer';
 export class SearchItemDto{
     @IsString()
     @IsOptional()
-    name?: string;
+     name?: string;
 
     @IsString()
     @IsOptional()
@@ -11,13 +11,16 @@ export class SearchItemDto{
 
     @IsNumber()
     @IsOptional()
+    @Type(() => Number)
     minPrice?: number;
 
     @IsNumber()
     @IsOptional()
-    maxPrice?: string;
+    @Type(() => Number)
+    maxPrice?: number;
 
     @IsBoolean()
     @IsOptional()
-    inStock?: string;
+    @Type(() => Boolean)
+    inStock?: boolean;
 }

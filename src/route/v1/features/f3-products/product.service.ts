@@ -12,4 +12,6 @@ export default class ProductService extends BaseService<ProductDocument> {
   ) {
     super(logger, productRepository);
   }
+
+  
 }

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema({ timestamps: true, versionKey: false, collection: 'themetypes' })
+@Schema({ timestamps: true, versionKey: false, collection: 'products' })
 export class SearchItem extends Document{
   @Prop({ required: true })
   name: string;

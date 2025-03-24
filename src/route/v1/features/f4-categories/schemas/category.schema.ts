@@ -1,11 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { IsMongoId } from 'class-validator';
+import mongoose from 'mongoose';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'categories' })
 export class Category {
 
-  @Prop({ type:  mongoose.Schema.Types.ObjectId, ref: 'Category', default: null })
-  parentId:  mongoose.Schema.Types.ObjectId | null;
+  @Prop({ type: String, ref: 'Category', default: null })
+  @IsMongoId()
+  parentId:  string ;
 
   @Prop({ type: String, required: true })
   name: string;
