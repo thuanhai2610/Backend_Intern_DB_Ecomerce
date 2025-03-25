@@ -24,6 +24,7 @@ import CreateCartDto from './dto/create-cart.dto';
 import UpdateCartDto from './dto/update-cart.dto';
 import CartService from './cart.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { RemoveCartItemDto } from './dto/remove-cart-item.dto';
 
 @ApiTags('Carts')
 @UseInterceptors(WrapResponseInterceptor)
@@ -120,6 +121,14 @@ export default class CartController {
 
     return result;
   }
+  @Delete('remove/:userId/:skuId')
+  async removeCartItem(@Param() removeItemDto: RemoveCartItemDto) {
+    console.log('RemoveItemDto:', removeItemDto);
+    return this.cartService.removeCartItem(
+      removeItemDto.userId,
+      removeItemDto.skuId,
+    );
+  }
 
   /**
    * Paginate
@@ -167,6 +176,15 @@ export default class CartController {
     if (!result) throw new NotFoundException('The item does not exist');
 
     return result; 
+  }
+  @Get('total/:userId')
+  @HttpCode(200)
+  async totalCart(
+    @Param('userId') userId: string,
+    @Query() query: any,
+  ): Promise<any> {
+    const result = await this.cartService.totalCart(userId, query.filter);
+    return result;
   }
   
 }

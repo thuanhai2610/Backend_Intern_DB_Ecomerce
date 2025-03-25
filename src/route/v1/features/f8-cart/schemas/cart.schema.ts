@@ -9,9 +9,9 @@ export class Cart {
   @Prop({
     type : [
       {
-        productId : {type: String, ref: 'Product', require: true},
-        skuId : {type: String, ref: 'Sku', require: true},
-        quantity : {type: Number, require: true, min: 1}
+        productId : {type: String, ref: 'Product', required: true},
+        skuId : {type: String, ref: 'Sku', required: true},
+        quantity : {type: Number, required: true, min: 1}
       }
     ]
     , default: []

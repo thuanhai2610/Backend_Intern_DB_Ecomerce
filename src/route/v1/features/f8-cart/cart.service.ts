@@ -75,5 +75,54 @@ export default class CartService extends BaseService<CartDocument> {
     }
 
     return cart.save();
+
+
+    
   }
+  async removeCartItem(userId: string, skuId: string): Promise<{ message: string; cart: CartDocument }> {
+    if (!Types.ObjectId.isValid(userId)) {
+        throw new BadRequestException('userId không hợp lệ');
+    }
+    if (!Types.ObjectId.isValid(skuId)) {
+        throw new BadRequestException('skuId không hợp lệ');
+    }
+    const cart = await this.cartRepository.findOneBy({ userId: userId });
+    if (!cart) {
+        throw new NotFoundException('Giỏ hàng không tồn tại');
+    }
+    const updatedItems = cart.items.filter(
+        (item: { productId: string; skuId: string; quantity: number }) => item.skuId !== skuId,
+    );
+    if (updatedItems.length === cart.items.length) {
+        throw new NotFoundException('Sản phẩm không tồn tại trong giỏ hàng');
+    }
+
+    cart.items = updatedItems;
+    await this.cartRepository.updateOneById(cart._id, { items: updatedItems });
+
+    return { message: 'Sản phẩm đã được xóa khỏi giỏ hàng', cart };
+}
+
+
+async totalCart(userId: string, filter: any) {
+  const cart = await this.cartRepository.findOneBy(
+    { userId },
+    {
+      populate: {
+        path: 'items',
+        populate: { path: 'skuId' },
+      },
+    },
+  );
+  if (!cart) throw new NotFoundException('');
+
+  console.log(cart);
+  let total = 0;
+  cart.items.forEach((item: any) => {
+    console.log(item);
+    total += item.skuId.price * item.quantity;
+  });
+
+  return total;
+}
 }
