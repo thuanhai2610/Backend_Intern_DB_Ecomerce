@@ -1,13 +1,9 @@
-import { IsString, IsNumber, IsNotEmpty, Min } from "class-validator";
+import { IsString, IsNumber, IsNotEmpty, Min, IsMongoId } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 
 export class AddToCartDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    userId: string;
-
+    
     @ApiProperty()
     @IsString()
     @IsNotEmpty()

@@ -5,6 +5,7 @@ import CartController from './cart.controller';
 import CartRepository from './cart.repository';
 import CartService from './cart.service';
 import { Product, ProductSchema } from '../f3-products/schemas/product.schema';
+import { Sku, SkuSchema } from '../f7-skus/schemas/sku.schema';
 
 @Module({
   imports: [
@@ -13,7 +14,10 @@ import { Product, ProductSchema } from '../f3-products/schemas/product.schema';
         name: Cart.name,
         schema: CartSchema,
       },
-      { name: Product.name, schema: ProductSchema },
+      { name: Product.name, 
+        schema: ProductSchema },
+        { name: Sku.name, 
+          schema: SkuSchema },
     ]),
   ],
   controllers: [CartController],

@@ -3,22 +3,22 @@ import { ObjectId } from 'mongodb';
 
 @Schema({ timestamps: true, versionKey: false, collection: 'carts' })
 export class Cart {
-  @Prop({ type: ObjectId, ref: 'User', required: true })
-  userId: ObjectId;
+  @Prop({ type: String,ref: 'User', required: true })
+  userId: string;
 
   @Prop({
     type : [
       {
-        productId : {type: ObjectId, ref: 'Product', require: true},
-        skuId : {type: ObjectId, ref: 'Product', require: true},
+        productId : {type: String, ref: 'Product', require: true},
+        skuId : {type: String, ref: 'Sku', require: true},
         quantity : {type: Number, require: true, min: 1}
       }
     ]
     , default: []
   })
   items: {
-    productId: ObjectId,
-    skuId : ObjectId,
+    productId: string,
+    skuId : string,
     quantity: number
   }[];
 }

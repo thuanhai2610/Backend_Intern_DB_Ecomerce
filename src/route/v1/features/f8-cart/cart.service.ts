@@ -5,65 +5,83 @@ import { Cart, CartDocument } from './schemas/cart.schema';
 import CartRepository from './cart.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from '../f3-products/schemas/product.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { Sku } from '../f7-skus/schemas/sku.schema'; // Thêm import cho Sku
 
 @Injectable()
 export default class CartService extends BaseService<CartDocument> {
   constructor(
     readonly logger: CustomLoggerService,
-    readonly cartRepository: CartRepository, 
+    readonly cartRepository: CartRepository,
     @InjectModel(Cart.name) private readonly cartModel: Model<CartDocument>,
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectModel(Sku.name) private readonly skuModel: Model<Sku>, // Thêm model cho Sku
   ) {
     super(logger, cartRepository);
   }
 
+  async addToCart(userId: string, items: AddToCartDto[]): Promise<any> {
+  
+    // Chuyển đổi userId thành ObjectId
+    const userIdObject = new Types.ObjectId(userId);
 
-  async addToCart(AddToCartDto: AddToCartDto): Promise<any>{
-    const {userId, productId, skuId, quantity} = AddToCartDto;
+    // Kiểm tra từng item trong mảng items
+    for (const item of items) {
+      const { productId, skuId, quantity } = item;
 
-    this.logger.log ('info', `Adding product to cart: userId=${userId}, productId=${productId}, skuId=${skuId} `)
+      this.logger.log('info', `Adding product to cart: productId=${productId}, skuId=${skuId}`);
 
+      // Chuyển đổi productId và skuId thành ObjectId
+      const productIdObject = new Types.ObjectId(productId);
+      const skuIdObject = new Types.ObjectId(skuId);
 
-    const product = await this.productModel.findById(productId).exec();
-    if(!product) {
-      this.logger.log('error')
-      throw new NotFoundException
+      // Kiểm tra Product có tồn tại không
+      const product = await this.productModel.findById(productIdObject).exec();
+      if (!product) {
+        this.logger.log('error', `Product not found for productId: ${productId}`);
+        throw new NotFoundException('Product not found');
+      }
+
+      // Kiểm tra SKU có tồn tại không và thuộc về product
+      const sku = await this.skuModel.findOne({ _id: skuIdObject, productId: productIdObject }).exec();
+      if (!sku) {
+        this.logger.log('error', `Sku not found for skuId: ${skuId} or does not belong to productId: ${productId}`);
+        throw new NotFoundException('Sku not found');
+      }
+
+      // Kiểm tra số lượng tồn kho
+      if (sku.stock < quantity) {
+        this.logger.log('error', `Insufficient stock for skuId: ${skuId}, requested quantity: ${quantity}, available: ${sku.stock}`);
+        throw new BadRequestException('Insufficient stock');
+      }
     }
-    
-    const sku = await this.productModel.findById(skuId).exec();
-    if(!sku) {
-      this.logger.log('error')
-      throw new NotFoundException
 
+    // Tìm giỏ hàng của người dùng
+    let cart = await this.cartModel.findOne({ userId: userIdObject });
+
+    if (!cart) {
+      cart = new this.cartModel({
+        userId: userIdObject,
+        items: [],
+      });
     }
-     
-      if(!sku.inStock || sku.stockQuantity < quantity) {
-        this.logger.log('error')
-        throw new BadRequestException
 
+    // Thêm hoặc cập nhật items trong giỏ hàng
+    for (const item of items) {
+      const { productId, skuId, quantity } = item;
+
+      const existingItemIndex = cart.items.findIndex(
+        (cartItem) => cartItem.skuId.toString() === skuId && cartItem.productId.toString() === productId,
+      );
+
+      if (existingItemIndex !== -1) {
+        cart.items[existingItemIndex].quantity += quantity;
+      } else {
+        cart.items.push({ productId, skuId, quantity });
+      }
+    }
+
+    return cart.save();
   }
-  // let cart = await this.cartRepository.findOne({ userId });
-  // const existingItemIndex = cart.items.findIndex(
-  //   (item) => item.productId.toString() === productId && item.skuId.toString() === skuId,
-  // );
-
-  // if (existingItemIndex >= 0) {
-  //   // Nếu đã có, cập nhật số lượng
-  //   cart.items[existingItemIndex].quantity += quantity;
-  //   this.logger.log('info', `Updated quantity for productId=${productId}, skuId=${skuId} in cart`);
-  // } else {
-  //   // Nếu chưa có, thêm mới vào danh sách
-  //   cart.items.push({ productId, skuId, quantity });
-  //   this.logger.log('info', `Added new item to cart: productId=${productId}, skuId=${skuId}`);
-  // }
-
-  // // Cập nhật giỏ hàng
-  // const updatedCart = await this.cartRepository.updateById(cart._id, { items: cart.items });
-  // this.logger.log('info', `Successfully updated cart for userId=${userId}`);
-
-  // return updatedCart;
-
-}
 }
