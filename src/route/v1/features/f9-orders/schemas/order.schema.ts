@@ -20,6 +20,12 @@ export class Order {
 
   @Prop({ type: String, required: true, enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
   status: string;
+  checkout: {
+    totalAmount: number;
+    shippingCost: number;
+    subTotal: number; // tong tien sp
+    discountAmount: number; // tong tien giam gia
+  };
 }
 
 export type OrderDocument = Order & Document;

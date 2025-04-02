@@ -1,6 +1,14 @@
-import {IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { NotificationType } from '../enum/notifycation-type.enum';
 
-export default class CreateNotifycationDto {
+export default class CreateNotificationDto {
   @IsNotEmpty()
   @IsMongoId()
   senderId: string;
@@ -9,13 +17,13 @@ export default class CreateNotifycationDto {
   @IsMongoId()
   recipientId: string;
 
-  @IsNotEmpty()
-  @IsString()
-  notificationType: string;
+  @IsOptional()
+  @IsEnum(NotificationType)
+  notificationType: NotificationType;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  entityName: string;
+  entityName?: string;
 
   @IsNotEmpty()
   @IsMongoId()

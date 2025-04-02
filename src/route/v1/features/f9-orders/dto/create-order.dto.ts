@@ -1,5 +1,12 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-
+import {
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { OrderStatus } from '../enums/order-status.enum';
 
 export default class CreateOrderDto {
   @IsNotEmpty()
@@ -10,21 +17,19 @@ export default class CreateOrderDto {
   @IsMongoId()
   shopId: string;
 
-  @IsOptional()
   @IsMongoId()
+  @IsNotEmpty()
   discountId?: string;
 
-  @IsNotEmpty()
-  @IsMongoId()
-  shippingMethodId: string;
+  @IsOptional()
+  @IsString()
+  shippingMethodId?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  @Min(0)
   totalAmount: number;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsEnum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
-  status: string;
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 }

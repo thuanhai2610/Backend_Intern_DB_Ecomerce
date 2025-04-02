@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Notifycation, NotifycationSchema } from './schemas/notifycation.schema';
+import { Notification, NotificationSchema } from './schemas/notifycation.schema';
 import NotifycationController from './notifycation.controller';
 import NotifycationRepository from './notifycation.repository';
 import NotifycationService from './notifycation.service';
@@ -9,8 +9,8 @@ import NotifycationService from './notifycation.service';
   imports: [
     MongooseModule.forFeature([
       {
-        name: Notifycation.name,
-        schema: NotifycationSchema,
+        name: Notification.name,
+        schema: NotificationSchema,
       },
     ]),
   ],
