@@ -1,19 +1,19 @@
-import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export default class CreateShippingMethodDto {
-  @IsNotEmpty()
-  @IsMongoId()
-  shopId: string;
-
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @IsOptional()
   @IsNumber()
-  cost: number;
-
   @IsNotEmpty()
+  price: number;
+
   @IsNumber()
-  estimatedDeliveryTime: number;
+  @IsNotEmpty()
+  distance: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  duration: number;
 }
