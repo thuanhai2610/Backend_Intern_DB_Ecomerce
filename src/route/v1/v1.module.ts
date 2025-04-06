@@ -40,6 +40,21 @@ import OrderModule from './features/f9-orders/order.module';
 import OrderItemModule from './features/f10-orderitems/orderitem.module';
 import NotifycationModule from './features/f11-notifycations/notifycation.module';
 import SearchItemModule from './features/f12-searchItem/search-item.module';
+import BankModule from './features/f13-banks/bank.module';
+import BannerModule from './features/f14-banners/banner.module';
+import UserBankModule from './features/f15-userbanks/user-bank.module';
+import CustomerModule from './features/f18-customers/customer.module';
+import ReferralModule from './features/f19-referrals/referral.module';
+import UserAddressModule from './features/f20-users-address/user-address.module';
+import BrandModule from './features/f21-brands/brand.module';
+import AttributeModule from './features/f22-atrributes/attribute.module';
+import FlashSaleModule from './features/f23-flash-sales/flash-sale.module';
+import { ShopVoucher } from './features/f24-shop-vouchers/schemas/shop-voucher.schema';
+import ShopVoucherModule from './features/f24-shop-vouchers/shop-voucher.module';
+import ReviewModule from './features/f25-reviews/review.module';
+import ConversationModule from './features/f26-conversations/conversation.module';
+import MessageModule from './features/f27-messages/message.module';
+import BranchModule from './features/f28-branches/branch.module';
 const routes: Routes = [
   {
     path: '/v1',
@@ -70,6 +85,7 @@ const routes: Routes = [
       { path: '/transactions', module: TransactionModule },
       { path: '/notifications', module: NotificationModule },
       { path: '/settings', module: SettingModule },
+      { path: '/banks', module: BankModule },
       { path: '/countries', module: CountryModule },
 
       // Features
@@ -88,6 +104,21 @@ const routes: Routes = [
       { path: '/orderitems', module: OrderItemModule},
       { path: '/notifycations', module: NotifycationModule },
       { path: '/searchitems', module: SearchItemModule },
+      { path: '/banners', module: BannerModule },
+      { path: '/userbanks', module: UserBankModule },
+      { path: '/districts', module: DistrictModule },
+      { path: '/villages', module: VillageModule },
+      { path: '/customers', module: CustomerModule },
+      { path: '/referrals', module: ReferralModule },
+      { path: '/users-address', module: UserAddressModule },
+      { path: '/brands', module: BrandModule },
+      { path: '/attributes', module: AttributeModule },
+      { path: '/flash-sales', module: FlashSaleModule },
+      { path: '/shop-vouchers', module: ShopVoucherModule },
+      { path: '/reviews', module: ReviewModule },
+      { path: '/conversations', module: ConversationModule },
+      { path: '/messages', module: MessageModule },
+      { path: '/branches', module: BranchModule },
       { path: '/app-subscriptions', module: AppSubscriptionModule },
     ],
   },
@@ -128,6 +159,22 @@ const imports = [
   NotificationModule,
   SettingModule,
   CountryModule,
+  BankModule,
+  BannerModule,
+  UserBankModule,
+  DistrictModule,
+  VillageModule,
+CustomerModule,
+ReferralModule,
+UserAddressModule,
+BrandModule,
+AttributeModule,
+FlashSaleModule,
+ShopVoucherModule,
+ReviewModule,
+ConversationModule,
+MessageModule,
+BranchModule,
   TransactionModule,
 
   // features
