@@ -18,7 +18,7 @@ export class Order {
   @Prop({ type: Number, required: true, min: 0 })
   totalAmount: number;
 
-  @Prop({ type: String, required: true, enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
+  @Prop({ type: String, required: true, enum: ['PENDING', 'PROCESSING', 'shipped', 'delivered', 'CANCELED'] })
   status: string;
   checkout: {
     totalAmount: number;

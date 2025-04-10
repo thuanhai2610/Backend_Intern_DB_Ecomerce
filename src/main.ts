@@ -15,6 +15,7 @@ import morgan from 'morgan';
 import * as path from 'path';
 import { ExpressPeerServer } from 'peer';
 import AppModule from './route/app/app.module';
+import UserService from '@authorization/a1-user/user.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -90,9 +91,9 @@ async function bootstrap() {
 
   await app.get<GroupDetailService>(GroupDetailService).seed(router);
   await app.get<GroupApiService>(GroupApiService).seed(router);
-  // await app
-  //   .get<UserService>(UserService)
-  //   .seedAdminAndResetAuthorization(router);
+  await app
+    .get<UserService>(UserService)
+    .seedAdminAndResetAuthorization(router);
 }
 
 bootstrap();
