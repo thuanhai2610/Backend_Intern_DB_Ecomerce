@@ -8,6 +8,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+// import argon2 from 'argon2';
 import { Types } from 'mongoose';
 import ForgotPasswordDto from './dto/forgot-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -216,12 +217,12 @@ export default class AuthService {
     return this.otpService.sendOtpEmail({ email });
   }
 
-  /**
+   /**
    * Sign in with email and password
    * @param data
    * @returns
    */
-  public async signIn(data: SignInDto): Promise<AuthTokenPayload> {
+   public async signIn(data: SignInDto): Promise<AuthTokenPayload> {
     const { password, email, deviceID } = data;
 
     // Get and check user exist by phone
@@ -232,10 +233,9 @@ export default class AuthService {
 
     if (user.isDeleted) {
       throw new NotFoundException(
-        'The account has been removed from the system.',
+        'The account has been removed fromt the system.',
       );
     }
-
     // compare password
     const isValidPassword = await this.userRepository.checkPasswordById(
       user._id,
@@ -246,6 +246,7 @@ export default class AuthService {
     if (!isValidPassword)
       throw new BadRequestException('Incorrect phone or password.');
 
+
     // if exist deviceID => update deviceID and fcmTokens
     if (deviceID) {
       await this.userService.addDeviceID(user._id, deviceID);
@@ -254,55 +255,86 @@ export default class AuthService {
 
     // return authTokens
     return this.generateAuthTokens(user);
+
+
+
+
   }
 
-  /**
-   * Sign up with account email and password
-   * @param data
-   * @returns
-   */
-  public async signup(data: SignupDto): Promise<AuthTokenPayload> {
-    const { email, deviceID, otpCode, password, ...rest } = data;
+  public async signup(input: SignupDto) {
+    const user = await this.userRepository.findOneBy({
+      phone: input.phone,
+    });
 
-    // require email and password
-    if (!email || !password)
-      throw new BadRequestException('Email and password are required.');
-
-    // validate user
-    const userExist = await this.userService.validateUser({ email });
-
-    if (userExist && !userExist.isDeleted)
-      throw new BadRequestException('Account already exists in the system.');
-
-    // verify otpCode by email
-    await this.otpService.verifyOtpEmail({ email, otpCode });
-
-    // user item
-    const userItem = {
-      ...rest,
-      deleted: false,
-      email,
-      deviceID,
-      password,
-      fcmTokens: deviceID ? [deviceID] : [],
-    };
-
-    // if user has been deleted => update deleted = false
-    if (userExist && userExist.isDeleted) {
-      const userUpdated = await this.userService.updateOneById(
-        userExist._id,
-        userItem,
-      );
-
-      // generate auth tokens
-      return this.generateAuthTokens(userUpdated);
+    if (user && !user.isDeleted) {
+      throw new BadRequestException('user is already exists in system');
     }
 
-    // create new user
-    const newUser = await this.userRepository.create(userItem);
+    // verify otp by phone
+    await this.otpService.verifyOtpPhone({
+      phone: input.phone,
+      otpCode: input.otpCode,
+    });
 
-    return this.generateAuthTokens(newUser);
+    let data;
+    // if user exits has been delete
+    if (user && user.isDeleted) {
+      const updated = {
+        ...input,
+        isDeleted: false,
+      };
+      data = await this.userRepository.updateManyBy({ _id: user._id }, updated);
+    } else {
+      data = this.userRepository.create(input);
+    }
+
+    return {
+      message: 'create successfully',
+    };
   }
+
+  // public async signup(data: SignupDto): Promise<AuthTokenPayload> {
+  //   const { email, deviceID, otpCode, password, ...rest } = data;
+
+  //   // require email and password
+  //   if (!email || !password)
+  //     throw new BadRequestException('Email and password are required.');
+
+  //   // validate user
+  //   const userExist = await this.userService.validateUser({ email });
+
+  //   if (userExist && !userExist.isDeleted)
+  //     throw new BadRequestException('Account already exists in the system.');
+
+  //   // verify otpCode by email
+  //   await this.otpService.verifyOtpEmail({ email, otpCode });
+
+  //   // user item
+  //   const userItem = {
+  //     ...rest,
+  //     deleted: false,
+  //     email,
+  //     deviceID,
+  //     password,
+  //     fcmTokens: deviceID ? [deviceID] : [],
+  //   };
+
+  //   // if user has been deleted => update deleted = false
+  //   if (userExist && userExist.isDeleted) {
+  //     const userUpdated = await this.userService.updateOneById(
+  //       userExist._id,
+  //       userItem,
+  //     );
+
+  //     // generate auth tokens
+  //     return this.generateAuthTokens(userUpdated);
+  //   }
+
+  //   // create new user
+  //   const newUser = await this.userRepository.create(userItem);
+
+  //   return this.generateAuthTokens(newUser);
+  // }
 
   /**
    * Refresh token

@@ -17,13 +17,17 @@ import {
 import TransactionService from '@common/c11-transaction/transaction.service';
 import SettingService from '@common/c13-setting/setting.service';
 import { ONE_DAY_MILLISECONDS } from '@constant/date.constants';
+import argon2 from 'argon2';
 import { QueryOptions, Types } from 'mongoose';
 import CreateUserDto from './dto/create-user.dto';
+
 import { UpdatePasswordByEmailDto } from './dto/update-password-by-email.dto';
 import { UpdateRolesDto } from './dto/update-roles.dto';
 import UpdateUserDto from './dto/update-user.dto';
 import { ValidateUserDto } from './dto/validate-user.dto';
 import UserRepository from './user.repository';
+import RegisterDto from './dto/register.dto';
+import LoginDto from './dto/login.dto';
 
 @Injectable()
 export default class UserService extends BaseService<UserDocument> {
@@ -413,4 +417,39 @@ export default class UserService extends BaseService<UserDocument> {
     this.logger.log('Account admin: ', { email: admin?.email });
     this.logger.log('Total collections: ', admin?.groupDetails?.length);
   }
+
+
+
+  async login(input: LoginDto) {
+    const user = await this.userRepository.findOneBy({
+      $or: [{ phone: input.phone }, { email: input.email }],
+    });
+    if (!user) throw new NotFoundException('User not found.');
+
+    // check password
+    const checkPassword = await argon2.verify(user.password, input.password);
+    if (!checkPassword) {
+      throw new BadRequestException('Incorrect password.');
+    }
+
+    return {
+      message: 'Login successfully!',
+      user,
+    };
+  }
+
+  async register(input: RegisterDto) {
+    const user = await this.userRepository.findOneBy({
+      $or: [{ phone: input.phone }, { email: input.email }],
+    });
+    if (user) throw new BadRequestException('User already exists!');
+
+    const registeredUser = await this.userRepository.create(input);
+
+    return {
+      message: 'Register successfully!',
+      user: registeredUser,
+    };
+  }
+
 }

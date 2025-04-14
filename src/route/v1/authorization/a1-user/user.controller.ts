@@ -31,6 +31,7 @@ import { Gender } from './enums/gender.enum';
 import FcmUserService from './fcm/fcm-user.service';
 import UserRepository from './user.repository';
 import UserService from './user.service';
+import LoginDto from './dto/login.dto';
 
 @ApiTags('User')
 @Controller()
@@ -391,4 +392,31 @@ export default class UserController {
       projection,
     });
   }
+
+
+
+  /**
+   * login
+   * @param body
+   * @param id
+   * @returns
+   */
+  @Post('login')
+  @HttpCode(200)
+  async login(@Body() body: LoginDto): Promise<any> {
+    return this.userService.login(body);
+  }
+
+  /**
+   * register
+   * @param body
+   * @param id
+   * @returns
+   */
+  @Post('register')
+  @HttpCode(200)
+  async register(@Body() body: CreateUserDto): Promise<any> {
+    return this.userService.register(body);
+  }
 }
+

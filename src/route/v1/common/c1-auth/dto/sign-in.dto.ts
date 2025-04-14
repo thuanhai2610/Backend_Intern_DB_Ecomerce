@@ -20,8 +20,4 @@ export default class SignInDto {
   @IsOptional()
   @MinLength(12)
   deviceID?: string;
-
-  @IsOptional()
-  @IsString()
-  fullName: string;
 }

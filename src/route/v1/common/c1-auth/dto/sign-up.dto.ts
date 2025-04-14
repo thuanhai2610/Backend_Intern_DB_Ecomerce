@@ -2,22 +2,18 @@ import CreateUserDto from '@authorization/a1-user/dto/create-user.dto';
 import { RoleEnum } from '@enum/role-user.enum';
 import { PartialType } from '@nestjs/mapped-types';
 import {
-  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   Length,
-  MaxLength,
   MinLength,
 } from 'class-validator';
 
 export default class SignupDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
-  @IsEmail()
-  @MinLength(3)
-  @MaxLength(128)
-  readonly email: string;
+  @IsString()
+  readonly phone: string;
 
   @IsOptional()
   @IsString()
