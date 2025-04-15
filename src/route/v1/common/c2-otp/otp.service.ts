@@ -23,31 +23,21 @@ export default class OtpService extends BaseService<OtpDocument> {
     super(logger, otpRepository);
   }
 
-  /**
-   * Send otp by phone
-   * @param data CreateOtpDto
-   * @returns OtpDocument
-   */
-  public async sendOtpByPhone(
-    data: SendOtpByPhoneDto,
-  ): Promise<OtpDocument | string> {
-    // Check can refresh otp
-    const otpRefresh = await this.refreshOtpByPhone(data.phone);
-    if (otpRefresh) return otpRefresh;
+  async sendOtpByPhone({ phone }: SendOtpByPhoneDto) {
+    // check phone exist
+    const optDoc = await this.refreshOtpByPhone(phone);
+    if (optDoc) return optDoc;
 
-    // send otp to phone number
+    //send otp to phone
     const otpCode = this.generateOTPCode();
-    await this.sendPhoneVerify(data.phone, otpCode);
+    await this.sendPhoneVerify(phone, otpCode);
 
     // create new otp doc
     // FIXME [PRODUCTION]: Remove comment
-    // return this.otpRepository.create({ ...data, otpCode });
-
-    // FIXME [DEVELOPMENT]: comment
-    await this.otpRepository.create({ ...data, otpCode });
+    // return this.otpRepository.create({ phone, otpCode });
+    await this.otpRepository.create({ phone, otpCode });
     return otpCode;
   }
-
   /**
    * Send opt by email
    * @param email: string

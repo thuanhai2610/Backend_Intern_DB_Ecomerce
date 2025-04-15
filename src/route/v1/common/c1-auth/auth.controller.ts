@@ -20,6 +20,7 @@ import SignupDto from './dto/sign-up.dto';
 import SignInLocalDto from './dto/signin-local.dto';
 import SignInWithSocialDto from './dto/signin-with-social.dto';
 import SignupLocalDto from './dto/sigup-local.dto';
+import { resetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Auth')
 @Controller()
@@ -130,5 +131,13 @@ export default class AuthController {
   @Put('refresh-token')
   async refreshToken(@Body() { refreshToken }: RefreshTokenDto) {
     return this.authService.refreshToken({ refreshToken });
+  }
+
+  @Put('reset-password/:id')
+  async resetPassword(
+    @Body() body: resetPasswordDto,
+    @Param('id') userId: string,
+  ) {
+    return this.authService.resetPassword(body, userId);
   }
 }
