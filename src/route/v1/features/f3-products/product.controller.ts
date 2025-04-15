@@ -20,12 +20,15 @@ import { Types } from 'mongoose';
 import CreateProductDto from './dto/create-product.dto';
 import UpdateProductDto from './dto/update-product.dto';
 import ProductService from './product.service';
+import HistoryService from '@common/c9-history/history.service';
 
 @ApiTags('Products')
 @UseInterceptors(WrapResponseInterceptor)
 @Controller()
 export default class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService,
+  private readonly historyService: HistoryService,
+  ) {}
 
   /**
    * Find all
@@ -131,7 +134,32 @@ export default class ProductController {
       projection,
     });
   }
+  @Get('search')
+  @HttpCode(200)
+  async getSearchHistory(): Promise<any> {
+    const history = await this.historyService.findManyBy(
+      { action: 'SEARCH' },
+      {
+        projection: { url: 1, _id: 0 },
+        sort: { createdAt: -1 },
+      },
+    );
 
+    const uniqueUrls: string[] = [];
+    const seen = new Set<string>();
+
+    for (const item of history) {
+      const url = item.url?.trim();
+      if (url && !seen.has(url)) {
+        seen.add(url);
+        uniqueUrls.push(url);
+      }
+
+      if (uniqueUrls.length >= 10) break; // Giới hạn 10 kết quả duy nhất
+    }
+
+    return uniqueUrls;
+  }
   /**
    * Find one by ID
    *
@@ -150,4 +178,5 @@ export default class ProductController {
 
     return result;
   }
+ 
 }

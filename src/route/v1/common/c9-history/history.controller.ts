@@ -116,6 +116,19 @@ export default class HistoryController {
    * @param id
    * @returns
    */
+  @Get('search')
+  @HttpCode(200)
+  async getSearchHistory(): Promise<any> {
+    return this.historyService.findManyBy(
+      {
+        action: 'SEARCH',
+      },
+      {
+        sort: { createdAt: -1 },
+        limit: 5,
+      },
+    );
+  }
   @Get(':id')
   @HttpCode(200)
   async findOneById(
@@ -128,4 +141,5 @@ export default class HistoryController {
 
     return result;
   }
+ 
 }
