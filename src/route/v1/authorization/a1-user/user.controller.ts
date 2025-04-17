@@ -3,6 +3,7 @@ import { GetCurrentUserId } from '@decorator/get-current-user-id.decorator';
 import AqpDto from '@interceptor/aqp/aqp.dto';
 import { UserFcmMessageInterface } from '@lazy-module/fcm/interfaces/user-fcm-message.interface';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -32,6 +33,7 @@ import FcmUserService from './fcm/fcm-user.service';
 import UserRepository from './user.repository';
 import UserService from './user.service';
 import LoginDto from './dto/login.dto';
+import { UserDocument } from './schemas/user.schema';
 
 @ApiTags('User')
 @Controller()
@@ -381,17 +383,17 @@ export default class UserController {
    * @param id
    * @returns
    */
-  @Get(':id')
-  @HttpCode(200)
-  async findOneById(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @ApiQueryParams() { population, projection }: AqpDto,
-  ) {
-    return this.userService.findOneById(id, {
-      populate: population,
-      projection,
-    });
-  }
+  // @Get(':id')
+  // @HttpCode(200)
+  // async findOneById(
+  //   @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+  //   @ApiQueryParams() { population, projection }: AqpDto,
+  // ) {
+  //   return this.userService.findOneById(id, {
+  //     populate: population,
+  //     projection,
+  //   });
+  // }
 
 
 
@@ -418,5 +420,40 @@ export default class UserController {
   async register(@Body() body: CreateUserDto): Promise<any> {
     return this.userService.register(body);
   }
+  @Delete('delete/email')
+  async deleteByEmail(@Body('email') email: string): Promise<{ message: string }> {
+    if (!email) {
+      throw new NotFoundException('Email là bắt buộc.');
+    }
+
+    await this.userRepository.deleteByEmail(email);
+    return { message: 'Xoá tài khoản thành công.' };
+  }
+  @Post('logout')
+async logout(@Body('userId') userId: string): Promise<{ message: string }> {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new BadRequestException('userId không hợp lệ.');
+  }
+
+  await this.userRepository.logoutUserById(new Types.ObjectId(userId));
+  return { message: 'Đăng xuất thành công.' };
+}
+@Get('profile')
+  async getProfileByEmail(
+    @Query('email') email: string
+  ): Promise<UserDocument> {
+    if (!email) {
+      throw new BadRequestException('Bạn phải truyền email.');
+    }
+
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`Không tìm thấy user với email ${email}`);
+    }
+
+    return user;
+  }
+
+
 }
 

@@ -409,4 +409,8 @@ export default class AuthService {
 
     return { result, message: 'Reset password successfully' };
   }
+  async deleteUserByEmail(email: string): Promise<void> {
+    await this.userRepository.deleteByEmail(email);
+  }
+  
 }

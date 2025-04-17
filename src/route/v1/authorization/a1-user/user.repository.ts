@@ -148,4 +148,23 @@ export default class UserRepository extends BaseRepository<UserDocument> {
   async comparePassword(hashPassword: string, plainPassword: string) {
     return verify(hashPassword, plainPassword);
   }
+ /**
+ * Xoá tài khoản theo email
+ * @param email
+ */
+public async deleteByEmail(email: string): Promise<void> {
+  const deleted = await this.userModel.findOneAndDelete({ email });
+
+  if (!deleted) {
+    throw new NotFoundException(`Không tìm thấy user với email: ${email}`);
+  } }
+  public async logoutUserById(userId: Types.ObjectId): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $unset: { tokenLogin: '', fcmTokens: '' } },
+    );
+  }
+  public async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
+  }
 }
