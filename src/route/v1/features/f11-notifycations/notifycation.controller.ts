@@ -142,12 +142,11 @@ export default class NotifycationController {
   @HttpCode(200)
   async findOneById(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @ApiQueryParams('population') populate: AqpDto,
+    @ApiQueryParams() { population, projection }: AqpDto,
   ): Promise<any> {
-    const result = await this.notificationService.findOneById(id, { populate });
-
-    if (!result) throw new NotFoundException('The item does not exist');
-
-    return result;
+    return this.notificationService.findOneById(id, {
+      populate: population,
+      projection,
+    });
   }
 }

@@ -67,4 +67,26 @@ export default class NotifycationService extends BaseService<NotificationDocumen
     };
     return descriptions[type] || 'chi tiết đơn hàng chưa có';
   }
+  async readNotification(notificationId: string) {
+    // Check notification is exist
+    const notification = await this.notificationRepository.findOneById(
+      notificationId,
+    );
+    if (!notification) {
+      throw new Error('Khong tim thay thong bao');
+    }
+
+    // Check notification is opened
+    if (notification.isOpened) {
+      throw new Error('Thông báo đã được mở');
+    }
+    // Update notification to opened
+    const updatedNotification = await this.notificationRepository.updateOneById(
+      notificationId,
+      {
+        isOpened: true,
+      },
+    );
+    return updatedNotification;
+  }
 }
