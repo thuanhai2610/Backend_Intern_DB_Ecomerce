@@ -55,6 +55,7 @@ import ReviewModule from './features/f25-reviews/review.module';
 import ConversationModule from './features/f26-conversations/conversation.module';
 import MessageModule from './features/f27-messages/message.module';
 import BranchModule from './features/f28-branches/branch.module';
+import PaymentModule from './features/f1-tests copy/payment.module';
 const routes: Routes = [
   {
     path: '/v1',
@@ -119,6 +120,7 @@ const routes: Routes = [
       { path: '/conversations', module: ConversationModule },
       { path: '/messages', module: MessageModule },
       { path: '/branches', module: BranchModule },
+      { path: '/payments', module: PaymentModule },
       { path: '/app-subscriptions', module: AppSubscriptionModule },
     ],
   },
@@ -191,7 +193,7 @@ OrderModule,
 OrderItemModule,
 NotifycationModule,
 SearchItemModule,
-
+PaymentModule,
 ];
 
 if (ShareFunction.checkIsConfigS3Storage()) {
