@@ -53,7 +53,6 @@ export default class ProductController {
   @HttpCode(201)
   async create(@Body() body: CreateProductDto): Promise<any> {
     const result = await this.productService.create(body);
-
     return result;
   }
 
