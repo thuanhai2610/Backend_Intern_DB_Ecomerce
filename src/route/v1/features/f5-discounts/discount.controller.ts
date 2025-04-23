@@ -50,7 +50,6 @@ export default class DiscountController {
   @HttpCode(201)
   async create(@Body() body: CreateDiscountDto): Promise<any> {
     const result = await this.discountService.create(body);
-
     return result;
   }
 

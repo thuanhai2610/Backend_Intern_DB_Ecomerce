@@ -145,9 +145,7 @@ export default class ShopVoucherController {
     @ApiQueryParams('population') populate: AqpDto,
   ): Promise<any> {
     const result = await this.shopVoucherService.findOneById(id, { populate });
-
     if (!result) throw new NotFoundException('The item does not exist');
-
     return result;
   }
    
