@@ -55,7 +55,7 @@ import ReviewModule from './features/f25-reviews/review.module';
 import ConversationModule from './features/f26-conversations/conversation.module';
 import MessageModule from './features/f27-messages/message.module';
 import BranchModule from './features/f28-branches/branch.module';
-import PaymentModule from './features/f1-tests copy/payment.module';
+import PaymentModule from './features/f29-payments/payment.module';
 const routes: Routes = [
   {
     path: '/v1',

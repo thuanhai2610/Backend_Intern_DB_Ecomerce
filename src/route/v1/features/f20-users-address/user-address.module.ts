@@ -16,6 +16,6 @@ import UserAddressService from './user-address.service';
   ],
   controllers: [UserAddressController],
   providers: [UserAddressService, UserAddressRepository],
-  exports: [UserAddressService, UserAddressRepository],
+  exports: [UserAddressService, UserAddressRepository,MongooseModule],
 })
 export default class UserAddressModule {}

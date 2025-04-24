@@ -16,12 +16,16 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import ParseObjectIdPipe from '@pipe/parse-object-id.pipe';
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import CreatePaymentDto from './dto/create-payment.dto';
 import UpdatePaymentDto from './dto/update-payment.dto';
 import PaymentService from './payment.service';
 import ProductService from '../f3-products/product.service';
 import UserAddressService from '../f20-users-address/user-address.service';
+import { InjectModel } from '@nestjs/mongoose';
+import PaymentModule from './payment.module';
+import { Payment, PaymentDocument } from './schemas/payment.schema';
+import { UserAddress, UserAddressDocument } from '../f20-users-address/schemas/user-address.schema';
 
 @ApiTags('Payments')
 @UseInterceptors(WrapResponseInterceptor)
@@ -30,6 +34,9 @@ export default class PaymentController {
   constructor(private readonly paymentService: PaymentService,
     private readonly userAddressService: UserAddressService,
     private readonly productService: ProductService,
+    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
+    @InjectModel(UserAddress.name) private readonly userAddressModel: Model<UserAddressDocument>,
+
   ) {}
 
   /**
@@ -54,44 +61,56 @@ export default class PaymentController {
   @Post('checkout')
 @HttpCode(200)
 async checkout(@Body() body: CreatePaymentDto): Promise<any> {
-  const { productId, quantity,userId } = body;
+  const { productId, quantity, userId, deliveriAddress } = body;
 
+  // Kiểm tra sản phẩm
   const product = await this.productService.findOneById(productId);
-
   if (!product || !product.inStock || product.stockQuantity < quantity) {
     throw new NotFoundException('Product unavailable or not enough stock');
   }
+
+  // Cập nhật tồn kho sản phẩm
   await this.productService.updateOneById(productId, {
     stockQuantity: product.stockQuantity - quantity,
     inStock: product.stockQuantity - quantity > 0,
   });
-  const userAddress = await this.userAddressService.findOneBy({userId});
-  return {
-    message: 'Checkout successful',
+
+  // Lấy danh sách địa chỉ của user
+  const userAddresses = await this.userAddressModel.find({ userId }).lean();
+
+  // Tìm địa chỉ được chọn theo id
+  const selectedAddress = userAddresses.find(addr => addr._id.toString() === deliveriAddress);
+  if (!selectedAddress) {
+    throw new NotFoundException('Selected delivery address not found');
+  }
+
+  // Cập nhật tất cả địa chỉ khác thành false
+  await this.userAddressModel.updateMany({ userId }, { $set: { isDefault: false } });
+
+  // Gán địa chỉ được chọn thành true
+  await this.userAddressModel.updateOne({ _id: deliveriAddress }, { $set: { isDefault: true } });
+
+  // Tạo thanh toán
+  const payment = await this.paymentModel.create({
     productId,
     quantity,
     totalPrice: product.price * quantity,
-    userAddress,
+    userId,
+    deliveriAddress: selectedAddress.street, // chỉ lưu street
+  });
+
+  return {
+    message: 'Checkout successful',
+    productId,
+    paymentId: payment._id,
+    quantity,
+    totalPrice: product.price * quantity,
+    userAddresses,
+    deliveriAddress: selectedAddress.street,
   };
 }
 
-  /**
-   * Update by ID
-   *
-   * @param id
-   * @param body
-   * @returns
-   */
-  @Put(':id')
-  @HttpCode(200)
-  async update(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body() body: UpdatePaymentDto,
-  ): Promise<any> {
-    const result = await this.paymentService.updateOneById(id, body);
 
-    return result;
-  }
 
   /**
    * Delete hard many by ids

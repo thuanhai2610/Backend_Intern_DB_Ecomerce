@@ -16,16 +16,20 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import ParseObjectIdPipe from '@pipe/parse-object-id.pipe';
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import CreateUserAddressDto from './dto/create-user-address.dto';
 import UpdateUserAddressDto from './dto/update-user-address.dto';
 import UserAddressService from './user-address.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserAddress, UserAddressDocument } from './schemas/user-address.schema';
 
 @ApiTags('UserAddresss')
 @UseInterceptors(WrapResponseInterceptor)
 @Controller()
 export default class UserAddressController {
-  constructor(private readonly userAddressService: UserAddressService) {}
+  constructor(private readonly userAddressService: UserAddressService,
+    @InjectModel(UserAddress.name) private readonly userAddressModel: Model<UserAddressDocument>
+  ) {}
 
   /**
    * Find all
@@ -39,7 +43,17 @@ export default class UserAddressController {
     const result = await this.userAddressService.findManyBy(query);
     return result;
   }
-
+  @Get('user/:userId/address')
+  @HttpCode(200)
+  async getUserAddresses(@Param('userId') userId: string): Promise<any> {
+    const addresses = await this.userAddressModel.find({ userId }).lean();
+  
+    return {
+      message: `Found ${addresses.length} address(es) for userId ${userId}`,
+      data: addresses,
+    };
+  }
+  
   /**
    * Create
    *
@@ -53,6 +67,62 @@ export default class UserAddressController {
 
     return result;
   }
+  @Post('user/:userId/address')
+@HttpCode(201)
+async addDeliveryAddress(
+  @Param('userId') userId: string,
+  @Body() body: CreateUserAddressDto,
+): Promise<any> {
+  const addressId = new Types.ObjectId();
+  if (body.isDefault) {
+    await this.userAddressModel.updateMany(
+      { userId },
+      { $set: { isDefault: false } }
+    );
+  }
+  const createdAddress = await this.userAddressModel.create({
+    _id: addressId,
+    ...body,
+    userId,
+  });
+  await this.userAddressModel.findByIdAndUpdate(userId, {
+    $push: { deliveriAddress: createdAddress._id }
+  });
+  return {
+    message: 'Địa chỉ mới đã được thêm',
+    addressId: createdAddress._id,
+    address: createdAddress,
+  };
+}
+@Put('user/:userId/address/:addressId')
+@HttpCode(200)
+async updateDeliveryAddress(
+  @Param('userId') userId: string,
+  @Param('addressId') addressId: string,
+  @Body() body: Partial<CreateUserAddressDto>,
+): Promise<any> {
+  if (body.isDefault === true) {
+    await this.userAddressModel.updateMany(
+      { userId },
+      { $set: { isDefault: false } }
+    );
+  }
+
+  const updated = await this.userAddressModel.findOneAndUpdate(
+    { _id: addressId, userId },
+    { $set: body },
+    { new: true }
+  );
+
+  if (!updated) {
+    throw new NotFoundException('Địa chỉ không tìm thấy cho user');
+  }
+
+  return {
+    message: 'Sửa địa chỉ thành công',
+    data: updated,
+  };
+}
 
   /**
    * Update by ID

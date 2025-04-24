@@ -38,6 +38,12 @@ export class UserAddress {
 
   @Prop({ type: Boolean, default: false })
   isDefault: boolean;
+
+  @Prop({ type: String }) 
+  addressId?: string;
+
+  @Prop({ type: Object })
+  address?: any;
 }
 
 export type UserAddressDocument = UserAddress & Document;
