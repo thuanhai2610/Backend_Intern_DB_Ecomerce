@@ -49,7 +49,7 @@ export default class UserAddressController {
     const addresses = await this.userAddressModel.find({ userId }).lean();
   
     return {
-      message: `Found ${addresses.length} address(es) for userId ${userId}`,
+
       data: addresses,
     };
   }

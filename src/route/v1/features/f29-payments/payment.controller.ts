@@ -63,40 +63,37 @@ export default class PaymentController {
 async checkout(@Body() body: CreatePaymentDto): Promise<any> {
   const { productId, quantity, userId, deliveriAddress } = body;
 
-  // Kiểm tra sản phẩm
+  // kiểm tra sản phẩm
   const product = await this.productService.findOneById(productId);
   if (!product || !product.inStock || product.stockQuantity < quantity) {
-    throw new NotFoundException('Product unavailable or not enough stock');
+    throw new NotFoundException('sản phẩm không hợp lệ hoặc không đủ hàng');
   }
 
-  // Cập nhật tồn kho sản phẩm
+  // cập nhật kho sản phẩm
   await this.productService.updateOneById(productId, {
     stockQuantity: product.stockQuantity - quantity,
     inStock: product.stockQuantity - quantity > 0,
   });
 
-  // Lấy danh sách địa chỉ của user
+  // lấy danh sách địa chỉ của user
   const userAddresses = await this.userAddressModel.find({ userId }).lean();
 
-  // Tìm địa chỉ được chọn theo id
+  // tìm địa chỉ được chọn theo id
   const selectedAddress = userAddresses.find(addr => addr._id.toString() === deliveriAddress);
   if (!selectedAddress) {
-    throw new NotFoundException('Selected delivery address not found');
+    throw new NotFoundException('địa chỉ chọn không tìm thấy');
   }
-
-  // Cập nhật tất cả địa chỉ khác thành false
   await this.userAddressModel.updateMany({ userId }, { $set: { isDefault: false } });
 
-  // Gán địa chỉ được chọn thành true
+  // địa chỉ được chọn thành true
   await this.userAddressModel.updateOne({ _id: deliveriAddress }, { $set: { isDefault: true } });
 
-  // Tạo thanh toán
   const payment = await this.paymentModel.create({
     productId,
     quantity,
     totalPrice: product.price * quantity,
     userId,
-    deliveriAddress: selectedAddress.street, // chỉ lưu street
+    deliveriAddress: selectedAddress.street, 
   });
 
   return {
