@@ -62,23 +62,29 @@ export default class PaymentController {
   @Post('checkout')
   @HttpCode(200)
   async checkout(@Body() body: CreatePaymentDto): Promise<any> {
-    const { productId, quantity, userId, deliveriAddress, shippingMethodName } = body;
+    const {
+      productId,
+      quantity,
+      userId,
+      deliveriAddress,
+      shippingMethodName,
+      paymentMethod, 
+    } = body;
   
-    // Kiểm tra sản phẩm
     const product = await this.productService.findOneById(productId);
     if (!product || !product.inStock || product.stockQuantity < quantity) {
       throw new NotFoundException('sản phẩm không hợp lệ hoặc không đủ hàng');
     }
   
-    // Cập nhật kho
     await this.productService.updateOneById(productId, {
       stockQuantity: product.stockQuantity - quantity,
       inStock: product.stockQuantity - quantity > 0,
     });
   
-    // Lấy địa chỉ người dùng
     const userAddresses = await this.userAddressModel.find({ userId }).lean();
-    const selectedAddress = userAddresses.find(addr => addr._id.toString() === deliveriAddress);
+    const selectedAddress = userAddresses.find(
+      addr => addr._id.toString() === deliveriAddress,
+    );
     if (!selectedAddress) {
       throw new NotFoundException('địa chỉ chọn không tìm thấy');
     }
@@ -86,23 +92,21 @@ export default class PaymentController {
     await this.userAddressModel.updateMany({ userId }, { $set: { isDefault: false } });
     await this.userAddressModel.updateOne({ _id: deliveriAddress }, { $set: { isDefault: true } });
   
-    // 🚚 Kiểm tra phương thức vận chuyển
     const shippingMethod = await this.shippingMethodService.findByName(shippingMethodName);
     if (!shippingMethod) {
       throw new NotFoundException('Phương thức vận chuyển không tồn tại');
     }
   
-    // Tính tổng tiền
     const totalPrice = product.price * quantity + shippingMethod.price;
   
-    // Tạo đơn thanh toán
     const payment = await this.paymentModel.create({
       productId,
       quantity,
       totalPrice,
       userId,
       deliveriAddress: selectedAddress.street,
-      shippingMethodName: shippingMethod.name, 
+      shippingMethod: shippingMethod.name,
+      paymentMethod, 
     });
   
     return {
@@ -118,8 +122,10 @@ export default class PaymentController {
         distance: shippingMethod.distance,
         duration: shippingMethod.duration,
       },
+      paymentMethod, // ✅ Trả về trong response
     };
   }
+  
   
 
 

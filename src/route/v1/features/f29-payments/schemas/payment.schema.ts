@@ -14,6 +14,12 @@ export class Payment {
   deliveriAddress: string;
   @Prop({ type: Number, required: true })
   totalPrice: number;
+  @Prop({ required: true })
+  shippingMethod: string;
+  
+  @Prop({ required: true })
+paymentMethod: string;
+
 }
 
 export type PaymentDocument = Payment & Document;

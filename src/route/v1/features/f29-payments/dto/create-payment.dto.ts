@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { PaymentMethodEnum } from '../schemas/payment-method.enum';
 
 export default class CreatePaymentDto {
   @IsString()
@@ -18,5 +19,7 @@ export default class CreatePaymentDto {
   @IsString()
 @IsNotEmpty()
 shippingMethodName: string;
-
+@IsEnum(PaymentMethodEnum)
+@IsNotEmpty()
+paymentMethod: PaymentMethodEnum;
 }
