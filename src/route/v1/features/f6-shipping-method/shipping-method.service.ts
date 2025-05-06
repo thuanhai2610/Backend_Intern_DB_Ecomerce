@@ -1,12 +1,15 @@
 import BaseService from '@base-inherit/base.service';
 import CustomLoggerService from '@lazy-module/logger/logger.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ShippingMethodDocument } from './schemas/shipping-method.schema';
+import { ShippingMethod, ShippingMethodDocument } from './schemas/shipping-method.schema';
 import ShippingMethodRepository from './shipping-method.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export default class ShippingMethodService extends BaseService<ShippingMethodDocument> {
   constructor(
+    @InjectModel(ShippingMethod.name) private readonly shippingMethodModel: Model<ShippingMethodDocument>,
     readonly logger: CustomLoggerService,
     readonly shippingMethodRepository: ShippingMethodRepository,
   ) {
@@ -30,5 +33,8 @@ export default class ShippingMethodService extends BaseService<ShippingMethodDoc
       throw new NotFoundException('shipping method not found');
     }
     return shipping.cost;
+  }
+  async findByName(name: string): Promise<ShippingMethod | null> {
+    return this.shippingMethodModel.findOne({ name }).lean();
   }
 }

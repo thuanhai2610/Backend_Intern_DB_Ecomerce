@@ -7,6 +7,7 @@ import PaymentService from './payment.service';
 import ProductService from '../f3-products/product.service';
 import ProductModule from '../f3-products/product.module';
 import UserAddressModule from '../f20-users-address/user-address.module';
+import ShippingMethodModule from '../f6-shipping-method/shipping-method.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import UserAddressModule from '../f20-users-address/user-address.module';
         name: Payment.name,
         schema: PaymentSchema,
       },
-    ]),ProductModule, UserAddressModule
+    ]),ProductModule, UserAddressModule, ShippingMethodModule
   ] ,
   controllers: [PaymentController],
   providers: [PaymentService, PaymentRepository],
