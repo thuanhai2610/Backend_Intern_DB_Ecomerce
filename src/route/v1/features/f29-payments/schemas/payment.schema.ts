@@ -19,7 +19,8 @@ export class Payment {
   
   @Prop({ required: true })
 paymentMethod: string;
-
+@Prop({ default: 'pending', enum: ['pending', 'success', 'failed'] })
+status: string;
 }
 
 export type PaymentDocument = Payment & Document;

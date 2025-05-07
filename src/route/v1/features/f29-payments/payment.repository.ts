@@ -9,4 +9,5 @@ export default class PaymentRepository extends BaseRepository<PaymentDocument> {
   constructor(@InjectModel(Payment.name) model: PaginateModel<PaymentDocument>) {
     super(model);
   }
+  
 }
