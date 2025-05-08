@@ -9,6 +9,7 @@ import ProductModule from '../f3-products/product.module';
 import UserAddressModule from '../f20-users-address/user-address.module';
 import ShippingMethodModule from '../f6-shipping-method/shipping-method.module';
 import { MoMoService } from './momo.service';
+import { VnpayService } from './vnpay.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MoMoService } from './momo.service';
     ]),ProductModule, UserAddressModule, ShippingMethodModule
   ] ,
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentRepository, MoMoService],
+  providers: [PaymentService, PaymentRepository, MoMoService, VnpayService],
   exports: [PaymentService, PaymentRepository],
 })
 export default class PaymentModule {}

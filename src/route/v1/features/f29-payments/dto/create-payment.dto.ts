@@ -14,7 +14,7 @@ export default class CreatePaymentDto {
   userId: string;
   @IsNotEmpty()
   @IsString()
-  deliveriAddress: String
+  deliveriAddress: string
 
   @IsString()
 @IsNotEmpty()

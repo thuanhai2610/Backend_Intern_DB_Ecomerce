@@ -35,11 +35,7 @@ import { MoMoService } from './momo.service';
 @Controller()
 export default class PaymentController {
   constructor(private readonly paymentService: PaymentService,
-    private readonly shippingMethodService: ShippingMethodService,
-    private readonly productService: ProductService,
-    private readonly momoService: MoMoService,
-    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
-    @InjectModel(UserAddress.name) private readonly userAddressModel: Model<UserAddressDocument>,
+  
 
   ) {}
 
@@ -65,131 +61,47 @@ export default class PaymentController {
   @Post('checkout')
   @HttpCode(200)
   async checkout(@Body() body: CreatePaymentDto): Promise<any> {
-    const {
-      productId,
-      quantity,
-      userId,
-      deliveriAddress,
-      shippingMethodName,
-      paymentMethod, 
-    } = body;
-  
-    const product = await this.productService.findOneById(productId);
-    if (!product || !product.inStock || product.stockQuantity < quantity) {
-      throw new NotFoundException('sản phẩm không hợp lệ hoặc không đủ hàng');
-    }
-  
-    await this.productService.updateOneById(productId, {
-      stockQuantity: product.stockQuantity - quantity,
-      inStock: product.stockQuantity - quantity > 0,
-    });
-  
-    const userAddresses = await this.userAddressModel.find({ userId }).lean();
-    const selectedAddress = userAddresses.find(
-      addr => addr._id.toString() === deliveriAddress,
-    );
-    if (!selectedAddress) {
-      throw new NotFoundException('địa chỉ chọn không tìm thấy');
-    }
-  
-    await this.userAddressModel.updateMany({ userId }, { $set: { isDefault: false } });
-    await this.userAddressModel.updateOne({ _id: deliveriAddress }, { $set: { isDefault: true } });
-  
-    const shippingMethod = await this.shippingMethodService.findByName(shippingMethodName);
-    if (!shippingMethod) {
-      throw new NotFoundException('Phương thức vận chuyển không tồn tại');
-    }
-  
-    const totalPrice = product.price * quantity + shippingMethod.price;
-  
-    const payment = await this.paymentModel.create({
-      productId,
-      quantity,
-      totalPrice,
-      userId,
-      deliveriAddress: selectedAddress.street,
-      shippingMethod: shippingMethod.name,
-      paymentMethod, 
-    });
-  
-    if (paymentMethod === 'cod') {
-      return {
-        message: 'Đặt hàng thành công',
-        paymentId: payment._id,
-        productId,
-        quantity,
-        totalPrice,
-        deliveriAddress: selectedAddress.street,
-        shippingMethod: shippingMethod.name,
-        paymentMethod,
-      };
-    }
-    if (paymentMethod === 'momo') {
-      const momoUrl = this.momoService.createPaymentUrl(payment._id.toString(), totalPrice);
-      return {
-        message: 'Tạo thanh toán MoMo thành công',
-        payUrl: momoUrl,
-        paymentId: payment._id,
-      };
-    }
-    throw new NotFoundException('Phương thức thanh toán chưa được hỗ trợ');
+    return this.paymentService.checkout(body);
   }
-  
-  @Get('checkout/return')
-  async handleMoMoRedirect(@Query() query: any): Promise<any> {
-    const { resultCode, orderId, message } = query;
-
-    // Xác minh chữ ký
-    const isValidSignature = this.momoService.verifySignature(query);
-    if (!isValidSignature) {
-      throw new BadRequestException('Invalid MoMo signature');
-    }
-
-    // Kiểm tra resultCode
-    if (resultCode === '0') {
-      // Thanh toán thành công
-      await this.paymentService.updatePaymentStatus(orderId, 'success');
-      return {
-        message: 'Thanh toán MoMo thành công',
-        paymentId: orderId,
-        status: 'success',
-      };
+  @Get('vnpay/return')
+  async handleVnpayReturn(@Query() query: any) {
+    const result = await this.paymentService.handleVnpayReturn(query);
+    if (result.status === 'success') {
+      return { message: 'Payment successful', paymentId: result.paymentId,  finalAmount: result.finalAmount, };
     } else {
-      // Thanh toán thất bại
-      await this.paymentService.updatePaymentStatus(orderId, 'failed');
-      return {
-        message: `Thanh toán MoMo thất bại: ${message}`,
-        paymentId: orderId,
-        status: 'failed',
-      };
-    }
-  }
+      return { message: 'Payment failed', code: result.message };
+    } }
+  // @Get('checkout/return')
+  // async handleMoMoRedirect(@Query() query: any): Promise<any> {
+  //   const { resultCode, orderId, message } = query;
 
-  // @Post('checkout/return')
-  // @HttpCode(200)
-  // async handleMoMoIpn(@Body() body: any): Promise<any> {
   //   // Xác minh chữ ký
-  //   const isValidSignature = this.momoService.verifySignature(body);
-  //   console.log(isValidSignature)
+  //   const isValidSignature = this.momoService.verifySignature(query);
   //   if (!isValidSignature) {
   //     throw new BadRequestException('Invalid MoMo signature');
   //   }
 
-  //   const { orderId, resultCode } = body;
-
-  //   // Cập nhật trạng thái thanh toán
+  //   // Kiểm tra resultCode
   //   if (resultCode === '0') {
+  //     // Thanh toán thành công
   //     await this.paymentService.updatePaymentStatus(orderId, 'success');
+  //     return {
+  //       message: 'Thanh toán MoMo thành công',
+  //       paymentId: orderId,
+  //       status: 'success',
+  //     };
   //   } else {
+  //     // Thanh toán thất bại
   //     await this.paymentService.updatePaymentStatus(orderId, 'failed');
+  //     return {
+  //       message: `Thanh toán MoMo thất bại: ${message}`,
+  //       paymentId: orderId,
+  //       status: 'failed',
+  //     };
   //   }
-
-  //   // Phản hồi cho MoMo
-  //   return {
-  //     message: 'IPN received',
-  //     status: 'success',
-  //   };
   // }
+
+ 
 
   /**
    * Delete hard many by ids
